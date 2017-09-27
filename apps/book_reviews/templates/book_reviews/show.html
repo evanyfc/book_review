@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Book and Review</title>
+  </head>
+  <body>
+    <a href="{% url 'books:index' %}">Home</a>
+    <a href="{% url 'users:logout' %}">Logout</a>
+
+    <h1>{{book.title}}</h1>
+    <h3>Reviews:</h3>
+    {% for review in reviews %}
+    <hr>
+    <ul>
+      <li>Rating: <img src="../../static/book_reviews/img/{{ review.rating }}.png" alt="rating stars"></li>
+      <li><a href="{% url 'books:show_user' review.user.id %}">{{review.user.name}}</a> says: {{review.content}}</li>
+      {% if review.user.id == request.session.user.id %}
+        <a id="del" href="{% url 'books:delete_review' review.id %}" onClick=deleteConfirm()>Delete this Review</a>
+      {% endif %}
+    </ul>
+    {% endfor %}
+
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <li {% if message.tags %} class="{{message.tags}}"{% endif %}>{{message}}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    <form id="review_form" action="{% url 'books:add_review' book.id %}" method="POST">
+      {% csrf_token %}
+      Add a Review:
+      <br>
+      <textarea rows="4" cols="50" form="review_form" name="review">
+      </textarea>
+      <br>
+      Rating: <input type="number" name="rating" min="1" max="5" value="5"> stars
+      <br>
+      <input id="add" type="submit" value="Submit Review">
+    </form>
+  </body>
+</html>
